@@ -1,10 +1,17 @@
+using Api.Seguridad.Core.Application;
+using Api.Seguridad.Core.Entities;
+using Api.Seguridad.Core.JWTLogic;
 using Api.Seguridad.Core.Persistence;
+using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
@@ -31,6 +38,16 @@ namespace Api.Seguridad
             {
                 opt.UseSqlServer(Configuration.GetConnectionString("ConexionDB"));
             });
+            var builder = services.AddIdentityCore<User>();
+            var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
+            identityBuilder.AddEntityFrameworkStores<SecurityContext>();
+            identityBuilder.AddSignInManager<SignInManager<User>>();
+            services.TryAddSingleton<ISystemClock, SystemClock>();
+
+            services.AddMediatR(typeof(Register.UserRegisterCommand).Assembly);
+            services.AddAutoMapper(typeof(Register.UserRegisterHandler));
+            services.AddScoped<IJwtGenerator, JwtGenerator>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
