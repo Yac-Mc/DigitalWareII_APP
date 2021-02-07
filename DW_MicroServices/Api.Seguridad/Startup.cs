@@ -4,6 +4,7 @@ using Api.Seguridad.Core.JWTLogic;
 using Api.Seguridad.Core.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -14,10 +15,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Api.Seguridad
@@ -48,6 +51,19 @@ namespace Api.Seguridad
             services.AddAutoMapper(typeof(Register.UserRegisterHandler));
             services.AddScoped<IJwtGenerator, JwtGenerator>();
 
+            services.AddScoped<IUserSesion, UserSesion>();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("PxGIbVY9zg6aQFEQuKc61nbIX0kFHvba"));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+            {
+                opt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+                    ValidateAudience = false,
+                    ValidateIssuer = false
+                };
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -68,6 +84,8 @@ namespace Api.Seguridad
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {

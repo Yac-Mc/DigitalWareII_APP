@@ -26,5 +26,17 @@ namespace Api.Seguridad.Controllers
         {
             return await _meadiator.Send(parameters);
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<UserDto>> Login(Login.UserLoginCommand parameters)
+        {
+            return await _meadiator.Send(parameters);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<UserDto>> Get()
+        {
+            return await _meadiator.Send(new CurrentUser.CurrentUserCommand());
+        }
     }
 }
