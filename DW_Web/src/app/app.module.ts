@@ -1,38 +1,36 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from './app-routing.module';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { PagesModule } from './pages/pages.module';
+import { AuthModule } from './auth/auth.module';
 
 import { AppComponent } from './app.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
-import { LoginComponent } from './auth/login/login.component';
-import { RegisterComponent } from './auth/register/register.component';
-import { NopagefoundComponent } from './pages/nopagefound/nopagefound.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { BreadcrumbsComponent } from './shared/breadcrumbs/breadcrumbs.component';
-import { SidebarComponent } from './shared/sidebar/sidebar.component';
-import { HeaderComponent } from './shared/header/header.component';
-import { PagesComponent } from './pages/pages.component';
+import { NopagefoundComponent } from './nopagefound/nopagefound.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { InterceptorService } from './interceptors/interceptor.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    RegisterComponent,
     NopagefoundComponent,
-    DashboardComponent,
-    BreadcrumbsComponent,
-    SidebarComponent,
-    HeaderComponent,
-    PagesComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    PagesModule,
+    AuthModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: InterceptorService,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

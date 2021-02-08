@@ -81,6 +81,8 @@ namespace Api.Seguridad
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api.Seguridad v1"));
             }
 
+            app.UseCors(c => c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
             app.UseRouting();
 
             app.UseAuthorization();
